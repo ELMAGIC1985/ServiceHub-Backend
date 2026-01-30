@@ -1,0 +1,35 @@
+export const formatServices = (services) =>
+  services.map((service) => ({
+    _id: service?._id,
+    name: service?.serviceChildrenCategory?.name,
+    description: service?.serviceChildrenCategory?.description,
+    image: service?.serviceChildrenCategory?.image,
+    price: service?.serviceChildrenCategory?.price,
+    address: service?.address,
+    availability: service?.availability,
+    totalRatings: service?.totalRatings,
+    averageRating: service?.averageRating,
+    status: service?.status,
+    whatIncluded: service?.whatIncluded,
+    coupons: service?.coupons,
+    faqs: service?.faqs,
+    brands: service?.brands,
+    radius: service?.radius,
+    keywords: service?.serviceChildrenCategory?.keywords || [],
+    category: {
+      name: service?.serviceCategory?.name,
+      _id: service?.serviceCategory?._id,
+    },
+    subCategory: {
+      name: service?.serviceSubCategory?.name,
+      _id: service?.serviceSubCategory?._id,
+    },
+    vendor: {
+      firstName: service?.vendorId?.firstName,
+      lastName: service?.vendorId?.lastName,
+      email: service?.vendorId?.email,
+      phoneNumber: service?.vendorId?.phoneNumber,
+      _id: service?.vendorId?._id,
+    },
+    address: service?.address,
+  }));

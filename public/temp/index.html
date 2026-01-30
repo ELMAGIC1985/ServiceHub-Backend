@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FCM Token Generator - No Auth Required</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f7f9fc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 400px;
+        text-align: center;
+      }
+      h2 {
+        margin-bottom: 10px;
+        color: #333;
+      }
+      button {
+        background-color: #1976d2;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        margin: 10px 5px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s ease;
+        min-width: 160px;
+      }
+      button:hover:not(:disabled) {
+        background-color: #1565c0;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .token-box {
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 12px;
+        word-break: break-all;
+        max-height: 200px;
+        overflow-y: auto;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+      .status {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #666;
+        padding: 10px;
+        border-radius: 6px;
+      }
+      .error {
+        color: #d32f2f;
+        background: #ffebee;
+      }
+      .success {
+        color: #388e3c;
+        background: #e8f5e8;
+      }
+      .info {
+        color: #1976d2;
+        background: #e3f2fd;
+      }
+      .copy-btn {
+        background-color: #4caf50;
+        font-size: 12px;
+        padding: 8px 16px;
+        margin-top: 10px;
+      }
+      .copy-btn:hover:not(:disabled) {
+        background-color: #45a049;
+      }
+      .config-section {
+        background: #fff3e0;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: left;
+      }
+      .config-item {
+        margin: 8px 0;
+        font-family: monospace;
+        background: #f5f5f5;
+        padding: 5px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>FCM Token Generator</h2>
+      <p>Generate Firebase Cloud Messaging tokens without authentication.</p>
+
+      <div class="config-section">
+        <strong>📋 Configuration Checklist:</strong>
+        <div class="config-item">✅ Domain: 127.0.0.1 (authorized)</div>
+        <div class="config-item">⚠️ VAPID Key: Update required</div>
+        <div class="config-item">⚠️ Service Worker: /firebase-messaging-sw.js</div>
+      </div>
+
+      <button onclick="generateToken()" id="generateBtn">🔑 Generate FCM Token</button>
+      <button onclick="testNotification()" id="testBtn" class="copy-btn" disabled>🔔 Test Notification</button>
+
+      <div class="token-box" id="token-box">
+        <em>Click "Generate FCM Token" to get your token...</em>
+      </div>
+
+      <button onclick="copyToken()" id="copyBtn" class="copy-btn" style="display: none">📋 Copy Token</button>
+
+      <div class="status" id="status"></div>
+    </div>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: 'AIzaSyBkf07TZ_lA69j9LBAMcwOfOaXEdMZVUxI',
+        authDomain: 'homescrew-b7b08.firebaseapp.com',
+        projectId: 'homescrew-b7b08',
+        storageBucket: 'homescrew-b7b08.firebasestorage.app',
+        messagingSenderId: '351597022739',
+        appId: '1:351597022739:web:87b4af5b45de99ec6b79e6',
+      };
+
+      // TODO: Get your VAPID key from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
+      const VAPID_KEY = 'BGDTMvCRw00R1FRkldL8vPnJ_IBNeLbG01LY1SEw6io_S0LbCuBvSi2Lh9IsE9fsyuql1OcVMARvQSUZ65bsYuQ';
+
+      firebase.initializeApp(firebaseConfig);
+      const messaging = firebase.messaging();
+
+      let currentToken = null;
+
+      async function generateToken() {
+        const statusElement = document.getElementById('status');
+        const tokenBox = document.getElementById('token-box');
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const testBtn = document.getElementById('testBtn');
+
+        // Check if VAPID key is configured
+        // if (VAPID_KEY === 'BGnVkPWG0cVWUHLYDdLld1QcAEmFupvN6_Bp3Vdi0X9rcAYwtRuji_Whswig2pvgeyqEk_ROgREu-LT-5VTmKrQ') {
+        //   statusElement.innerHTML =
+        //     '<div class="error">❌ Please update the VAPID_KEY variable with your actual Firebase VAPID key from the console.</div>';
+        //   return;
+        // }
+
+        try {
+          generateBtn.disabled = true;
+          statusElement.innerHTML = '<div class="info">🔐 Requesting notification permission...</div>';
+
+          // Request notification permission
+          const permission = await Notification.requestPermission();
+
+          if (permission !== 'granted') {
+            statusElement.innerHTML =
+              '<div class="error">❌ Notification permission denied. Please enable notifications in your browser settings and try again.</div>';
+            generateBtn.disabled = false;
+            return;
+          }
+
+          statusElement.innerHTML = '<div class="info">🔑 Generating FCM token...</div>';
+
+          // Generate FCM token
+          currentToken = await messaging.getToken({
+            vapidKey: VAPID_KEY,
+          });
+
+          if (currentToken) {
+            tokenBox.textContent = currentToken;
+            copyBtn.style.display = 'inline-block';
+            testBtn.disabled = false;
+
+            statusElement.innerHTML = '<div class="success">✅ FCM token generated successfully!</div>';
+
+            // Optionally send to backend
+            try {
+              await sendTokenToBackend(currentToken);
+              statusElement.innerHTML =
+                '<div class="success">🚀 FCM token generated and sent to backend successfully!</div>';
+            } catch (err) {
+              console.warn('Failed to send to backend:', err);
+              statusElement.innerHTML =
+                '<div class="success">✅ FCM token generated successfully! (Backend connection failed - check if your server is running)</div>';
+            }
+          } else {
+            statusElement.innerHTML =
+              '<div class="error">❌ Failed to generate token. Please check your browser settings and try again.</div>';
+          }
+        } catch (err) {
+          console.error('Error generating FCM token:', err);
+
+          let errorMessage = 'Unknown error occurred';
+          if (err.code === 'messaging/invalid-vapid-key') {
+            errorMessage = 'Invalid VAPID key. Please check your Firebase configuration.';
+          } else if (err.code === 'messaging/permission-blocked') {
+            errorMessage = 'Notifications are blocked. Please enable them in browser settings.';
+          } else if (err.code === 'messaging/token-subscribe-failed') {
+            errorMessage = 'Failed to subscribe to FCM. This might be due to network issues or Firebase configuration.';
+          } else if (err.code === 'messaging/invalid-sw') {
+            errorMessage = 'Invalid service worker. Make sure firebase-messaging-sw.js is properly configured.';
+          } else if (err.message) {
+            errorMessage = err.message;
+          }
+
+          statusElement.innerHTML = `<div class="error">❌ Error: ${errorMessage}</div>`;
+        } finally {
+          generateBtn.disabled = false;
+        }
+      }
+
+      async function sendTokenToBackend(token) {
+        const backendUrl = `${window.location.protocol}//${window.location.hostname}:5000/api/save-fcm-token`;
+
+        const response = await fetch(backendUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Backend response:', data);
+        return data;
+      }
+
+      function copyToken() {
+        if (currentToken) {
+          navigator.clipboard
+            .writeText(currentToken)
+            .then(() => {
+              const statusElement = document.getElementById('status');
+              statusElement.innerHTML = '<div class="success">📋 Token copied to clipboard!</div>';
+            })
+            .catch((err) => {
+              console.error('Failed to copy token:', err);
+              // Fallback for older browsers
+              const textArea = document.createElement('textarea');
+              textArea.value = currentToken;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+
+              const statusElement = document.getElementById('status');
+              statusElement.innerHTML = '<div class="success">📋 Token copied to clipboard!</div>';
+            });
+        }
+      }
+
+      async function testNotification() {
+        if (!currentToken) return;
+
+        try {
+          const statusElement = document.getElementById('status');
+          statusElement.innerHTML = '<div class="info">🔔 Sending test notification...</div>';
+
+          // Send test notification via backend
+          const backendUrl = `${window.location.protocol}//${window.location.hostname}:5000/api/send-test-notification`;
+
+          const response = await fetch(backendUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              token: currentToken,
+              title: 'Test Notification',
+              body: 'This is a test notification from your FCM token generator!',
+            }),
+          });
+
+          if (response.ok) {
+            statusElement.innerHTML = '<div class="success">🔔 Test notification sent! Check your notifications.</div>';
+          } else {
+            throw new Error(`Failed to send notification: ${response.status}`);
+          }
+        } catch (err) {
+          console.error('Failed to send test notification:', err);
+          document.getElementById('status').innerHTML =
+            '<div class="error">❌ Failed to send test notification. Make sure your backend server is running.</div>';
+        }
+      }
+
+      // Handle foreground messages
+      messaging.onMessage((payload) => {
+        console.log('Message received in foreground:', payload);
+
+        // Show notification manually for foreground messages
+        if (payload.notification) {
+          new Notification(payload.notification.title, {
+            body: payload.notification.body,
+            icon: payload.notification.icon || '/firebase-logo.png',
+          });
+        }
+      });
+
+      // Register service worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .register('/firebase-messaging-sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered successfully:', registration);
+            messaging.useServiceWorker(registration);
+          })
+          .catch((err) => {
+            console.error('Service Worker registration failed:', err);
+            document.getElementById('status').innerHTML =
+              '<div class="error">⚠️ Service Worker registration failed. Background notifications may not work.</div>';
+          });
+      }
+
+      // Check if running on correct domain
+      if (window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost') {
+        document.getElementById('status').innerHTML =
+          '<div class="error">⚠️ This tool is configured for localhost/127.0.0.1. Update Firebase authorized domains for your current domain.</div>';
+      }
+    </script>
+  </body>
+</html>
